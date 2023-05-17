@@ -25,7 +25,8 @@
 
         .li {
             border: 1px solid gray;
-            width: 25%;
+            width: 12.5%;
+            font-size: 12px;
         }
     </style>
 </head>
@@ -48,9 +49,12 @@
             <option value="100">100</option>
             <option value="200">200</option>
             <option value="500">500</option>
+            <option value="500">1000</option>
         </select>
         <button id="test">开始测试</button>
     </div>
+
+    <div>测试过程可自由滚动列表，查看帧率变化</div>
 
     <div class="list">
     </div>
@@ -108,6 +112,9 @@
                 const item = document.createElement('div')
                 item.classList.add('item')
                 item.innerHTML = `
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
                 <div class="li">${NO}</div>
                 <div class="li">${NO}</div>
                 <div class="li">${NO}</div>
