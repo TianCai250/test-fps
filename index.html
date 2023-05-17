@@ -1,0 +1,144 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport"
+        content="width=device-width,initial-scale=1.0,maximum-scale=1.0, user-scalable=0, viewport-fit=cover">
+    <title>test-fps</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .item {
+            display: flex;
+        }
+
+        .list {
+            height: 70vh;
+            border: 1px solid blue;
+            overflow: auto;
+        }
+
+        .li {
+            border: 1px solid gray;
+            width: 25%;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <span>FPS帧率:</span>
+        <span id="fps"></span>
+    </div>
+
+    <div>
+        <span>渲染数据量：</span>
+        <span id="NO"></span>
+    </div>
+
+    <div class="btns">
+        选择每秒生成数据量：
+        <select class="selectList">
+            <option value="50" selected="selected">50</option>
+            <option value="100">100</option>
+            <option value="200">200</option>
+            <option value="500">500</option>
+        </select>
+        <button id="test">开始测试</button>
+    </div>
+
+    <div class="list">
+    </div>
+
+    <script>
+        let NO = 0;
+        const list = document.querySelector('.list');
+        const test = document.querySelector('#test');
+        const fpsEl = document.querySelector('#fps');
+        const NOEl = document.querySelector('#NO');
+        const selectList = document.querySelector('.selectList');
+
+        const getScreenFps = (() => {
+            const nextFrame = ([
+                window.requestAnimationFrame,
+                window.webkitRequestAnimationFrame,
+                window.mozRequestAnimationFrame
+            ]).find(fn => fn)
+            if (!nextFrame) {
+                console.error('requestAnimationFrame is not supported!')
+                return
+            }
+            return (targetCount = 50) => {
+                if (targetCount < 1) throw new Error('targetCount cannot be less than 1.')
+                const beginDate = Date.now()
+                let count = 0
+                return new Promise(resolve => {
+                    (function log() {
+                        nextFrame(() => {
+                            if (++count >= targetCount) {
+                                const diffDate = Date.now() - beginDate
+                                const fps = (count / diffDate) * 1000
+                                return resolve(fps)
+                            }
+                            log()
+                        })
+                    })()
+                })
+            }
+        })()
+
+        function refresh() {
+            getScreenFps().then(fps => {
+                fpsEl.innerHTML = fps.toFixed(0);
+                NOEl.innerHTML = NO
+                setTimeout(() => {
+                    refresh();
+                }, 1000)
+            })
+        }
+
+        function genItem(count) {
+            for (let i = 0; i < count; i++) {
+                NO++;
+                const item = document.createElement('div')
+                item.classList.add('item')
+                item.innerHTML = `
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
+                <div class="li">${NO}</div>
+            `
+                list.appendChild(item)
+            }
+        }
+
+        refresh();
+
+
+
+        let timer = null;
+        test.addEventListener('click', () => {
+            const count = +selectList.value;
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+                NO = 0;
+                list.innerHTML = '';
+                return;
+            }
+            timer = setInterval(() => {
+                genItem(count);
+            }, 1000)
+
+        })
+
+    </script>
+</body>
+
+</html>
